@@ -1,0 +1,83 @@
+INCLUDE 'emu8086.INC'
+ORG 100h
+
+.DATA
+ARRAY DB 10DUP(0)
+
+.CODE
+
+
+PRINT 'Enter list(10 values without space):'
+MOV CX, 10
+MOV BX, OFFSET ARRAY
+MOV AH, 1
+
+INPUT_ARRAY:
+INT 21H
+MOV [BX], AL
+INC BX
+Loop INPUT_ARRAY
+
+MOV CX,10
+MOV BX, OFFSET ARRAY
+
+; this loop to display elements on the screen
+PRINTN ''
+PRINT 'Unsorted list: '
+PRINT_UNSORTED_LIST:
+MOV AH, 2
+MOV DL, [BX]
+INT 21H
+
+MOV DL , 32
+MOV AH , 02H
+INT 21H
+
+INC BX
+loop PRINT_UNSORTED_LIST
+
+
+; first loop
+PRINTN ''
+MOV CX, 10
+DEC CX
+
+NEXT_SCAN:
+MOV BX, CX
+MOV SI, 0
+
+NEXT_COMP:
+MOV AL, ARRAY[SI]
+MOV DL, ARRAY[SI + 1]
+cmp AL, DL
+
+JC NO_SWAP
+
+MOV ARRAY[SI], DL
+MOV ARRAY[SI + 1], AL
+
+NO_SWAP:
+INC SI
+DEC BX
+JNZ NEXT_COMP
+
+loop NEXT_SCAN
+
+PRINT 'Sorted list  : '
+MOV CX, 10
+MOV BX, OFFSET ARRAY
+
+; this loop to display elements on the screen
+PRINT:
+MOV AH,2
+MOV DL,[BX]
+INT 21H
+
+MOV DL, 32
+MOV AH, 02H
+INT 21H
+
+INC BX
+loop PRINT
+
+RET
